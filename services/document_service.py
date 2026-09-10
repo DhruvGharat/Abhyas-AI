@@ -48,12 +48,16 @@ def _extract_from_pdf(file_source) -> str:
 
 def _extract_from_text_file(file_source) -> str:
     """
-    Extract text from plain text or Markdown document stream or path.
+    Extract text from plain text or Markdown document stream, path, or string.
     """
     try:
         if isinstance(file_source, (str, os.PathLike)):
-            with open(file_source, "r", encoding="utf-8", errors="ignore") as f:
-                return f.read()
+            if os.path.exists(file_source):
+                with open(file_source, "r", encoding="utf-8", errors="ignore") as f:
+                    return f.read()
+            else:
+                # If it's a raw string containing document text
+                return str(file_source)
         elif isinstance(file_source, bytes):
             return file_source.decode("utf-8", errors="ignore")
         elif hasattr(file_source, "read"):
@@ -62,7 +66,7 @@ def _extract_from_text_file(file_source) -> str:
                 return content.decode("utf-8", errors="ignore")
             return str(content)
         else:
-            raise ValueError("Invalid file source provided.")
+            return str(file_source)
     except Exception as error:
         raise RuntimeError(f"Failed to read text file: {error}")
 
