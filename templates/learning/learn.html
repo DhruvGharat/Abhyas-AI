@@ -282,47 +282,66 @@
 
 
         <!-- =========================
-             FUTURE AI TUTOR
+             AI TUTOR SECTION
         ========================== -->
 
-        <section class="tutor-placeholder" id="tutor">
+        <section class="tutor-section" id="tutor">
 
-            <div class="tutor-icon">
+            <div class="tutor-header">
 
-                🤖
+                <div class="section-label">
+
+                    🤖 STEP 03 — ABHYAS AI TUTOR
+
+                </div>
+
+                <h2>
+
+                    GOT A <span>DOUBT?</span> ASK YOUR SIDEKICK!
+
+                </h2>
+
+                <p>
+
+                    Ask any question about the lecture you're studying, and Abhyas AI will break it down for you!
+
+                </p>
 
             </div>
 
 
-            <div>
+            <div class="tutor-card">
 
-                <div class="section-label">
+                <div class="tutor-chat-window" id="tutor-chat-window">
 
-                    STEP 03 — AI TUTOR
+                    <div class="chat-bubble ai-bubble">
+
+                        <div class="bubble-avatar">🤖</div>
+
+                        <div class="bubble-content">
+
+                            <strong>Abhyas AI:</strong><br>
+
+                            Hey study hero! What didn't you understand from the lecture? Ask me anything and I'll break it down for you! ⚡
+
+                        </div>
+
+                    </div>
 
                 </div>
 
 
-                <h2>
+                <div class="tutor-input-wrapper">
 
-                    GOT A <span>DOUBT?</span>
+                    <input type="text" id="tutor-question" placeholder="e.g. Explain the main topic in simple terms...">
 
-                </h2>
+                    <button class="comic-button yellow" id="tutor-send-button">
 
+                        ASK DOUBT 💥
 
-                <p>
+                    </button>
 
-                    Ask Abhyas AI anything about the
-                    lecture you're studying.
-
-                </p>
-
-
-                <button class="comic-button white">
-
-                    TUTOR COMING SOON ⚡
-
-                </button>
+                </div>
 
             </div>
 
@@ -461,11 +480,14 @@
 
 
                     /*
-                    Store quiz
+                    Store quiz & video ID
                     */
 
                     quizData =
                         data.quiz.questions;
+
+                    currentVideoId =
+                        data.video_id;
 
 
                     /*
@@ -799,6 +821,109 @@
 
             }
         );
+
+
+        /*
+        =========================================
+        AI TUTOR CHAT
+        =========================================
+        */
+
+        let currentVideoId = null;
+
+        const tutorChatWindow = document.getElementById("tutor-chat-window");
+        const tutorQuestionInput = document.getElementById("tutor-question");
+        const tutorSendButton = document.getElementById("tutor-send-button");
+
+        async function askTutor() {
+            const question = tutorQuestionInput.value.trim();
+
+            if (!question) {
+                alert("Please enter a question for the AI Tutor.");
+                return;
+            }
+
+            // Append user bubble
+            appendChatBubble("user", "YOU", question);
+
+            tutorQuestionInput.value = "";
+            tutorSendButton.disabled = true;
+            tutorSendButton.textContent = "THINKING... 🧠";
+
+            // Append loading bubble
+            const loadingBubble = appendChatBubble("ai loading", "Abhyas AI", "Analyzing transcript and thinking... ⚡");
+
+            try {
+                const response = await fetch("/ask-tutor", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        video_id: currentVideoId
+                    })
+                });
+
+                const data = await response.json();
+
+                // Remove loading bubble
+                if (loadingBubble && loadingBubble.parentNode) {
+                    loadingBubble.parentNode.removeChild(loadingBubble);
+                }
+
+                if (!data.success) {
+                    appendChatBubble("ai", "Abhyas AI", "❌ " + (data.error || "Could not answer your question."));
+                } else {
+                    appendChatBubble("ai", "Abhyas AI", data.answer);
+                }
+
+            } catch (error) {
+                console.error(error);
+                if (loadingBubble && loadingBubble.parentNode) {
+                    loadingBubble.parentNode.removeChild(loadingBubble);
+                }
+                appendChatBubble("ai", "Abhyas AI", "❌ Something went wrong while connecting to the AI Tutor.");
+            } finally {
+                tutorSendButton.disabled = false;
+                tutorSendButton.textContent = "ASK DOUBT 💥";
+            }
+        }
+
+        function appendChatBubble(type, senderName, messageText) {
+            const bubble = document.createElement("div");
+            bubble.className = `chat-bubble ${type}-bubble`;
+
+            const avatar = document.createElement("div");
+            avatar.className = "bubble-avatar";
+            avatar.textContent = type.includes("user") ? "🎓" : "🤖";
+
+            const content = document.createElement("div");
+            content.className = "bubble-content";
+            content.innerHTML = `<strong>${senderName}:</strong><br>${escapeHtml(messageText)}`;
+
+            bubble.appendChild(avatar);
+            bubble.appendChild(content);
+
+            tutorChatWindow.appendChild(bubble);
+            tutorChatWindow.scrollTop = tutorChatWindow.scrollHeight;
+
+            return bubble;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, "<br>");
+        }
+
+        tutorSendButton.addEventListener("click", askTutor);
+
+        tutorQuestionInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                askTutor();
+            }
+        });
 
     </script>
 </body>

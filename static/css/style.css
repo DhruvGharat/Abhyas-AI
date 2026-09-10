@@ -1847,3 +1847,140 @@ body {
     }
 
 }
+
+
+/* =========================================
+   ABHYAS AI TUTOR SECTION
+========================================= */
+
+.tutor-section {
+    width: min(1000px, calc(100% - 40px));
+    margin: 80px auto;
+}
+
+.tutor-header {
+    margin-bottom: 25px;
+}
+
+.tutor-header h2 {
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: clamp(28px, 4vw, 42px);
+    margin: 10px 0;
+}
+
+.tutor-header h2 span {
+    color: var(--blue);
+    -webkit-text-stroke: 1.5px var(--black);
+}
+
+.tutor-card {
+    background: var(--white);
+    border: 5px solid var(--black);
+    box-shadow: 9px 9px 0 var(--black);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tutor-chat-window {
+    height: 380px;
+    overflow-y: auto;
+    background: var(--cream);
+    border: 4px solid var(--black);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+}
+
+.chat-bubble {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 85%;
+}
+
+.chat-bubble.ai-bubble {
+    align-self: flex-start;
+}
+
+.chat-bubble.user-bubble {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.bubble-avatar {
+    width: 44px;
+    height: 44px;
+    background: var(--yellow);
+    border: 3px solid var(--black);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 3px 3px 0 var(--black);
+}
+
+.user-bubble .bubble-avatar {
+    background: var(--blue);
+}
+
+.bubble-content {
+    background: white;
+    border: 3px solid var(--black);
+    box-shadow: 4px 4px 0 var(--black);
+    padding: 14px 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--black);
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.user-bubble .bubble-content {
+    background: var(--blue);
+    color: white;
+}
+
+.chat-bubble.ai-bubble.loading .bubble-content {
+    font-style: italic;
+    color: #666;
+}
+
+.tutor-input-wrapper {
+    display: flex;
+    gap: 15px;
+}
+
+.tutor-input-wrapper input {
+    flex: 1;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    font-weight: 700;
+    border: 4px solid var(--black);
+    box-shadow: 4px 4px 0 var(--black);
+    background: white;
+    outline: none;
+}
+
+.tutor-input-wrapper input:focus {
+    background: var(--cream);
+}
+
+@media (max-width: 650px) {
+    .tutor-card {
+        padding: 20px;
+    }
+    .tutor-input-wrapper {
+        flex-direction: column;
+    }
+    .chat-bubble {
+        max-width: 95%;
+    }
+}
