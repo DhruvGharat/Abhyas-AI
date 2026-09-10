@@ -1,18 +1,6 @@
-import os
 from typing import List
-from dotenv import load_dotenv
-from google import genai
 from models.exam_models import Syllabus, PYQAnalysis
-
-load_dotenv()
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY is missing. Please add it to your .env file.")
-
-client = genai.Client(api_key=GEMINI_API_KEY)
-MODEL_NAME = "gemini-3.6-flash"
+from services.gemini_service import call_gemini_with_retry
 
 
 def analyze_pyqs(pyq_texts: List[str], syllabus: Syllabus) -> PYQAnalysis:
@@ -50,9 +38,8 @@ Past Year Question Papers (PYQs):
 ---------------------------------
 """
 
-    interaction = client.interactions.create(
-        model=MODEL_NAME,
-        input=prompt,
+    response_text = call_gemini_with_retry(
+        prompt=prompt,
         response_format={
             "type": "text",
             "mime_type": "application/json",
@@ -60,5 +47,5 @@ Past Year Question Papers (PYQs):
         }
     )
 
-    pyq_analysis = PYQAnalysis.model_validate_json(interaction.output_text)
+    pyq_analysis = PYQAnalysis.model_validate_json(response_text)
     return pyq_analysis

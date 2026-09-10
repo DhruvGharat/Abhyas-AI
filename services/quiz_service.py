@@ -1,29 +1,7 @@
-import os
-
-from dotenv import load_dotenv
-from google import genai
-from pydantic import BaseModel, Field
 from typing import List
+from pydantic import BaseModel, Field
+from services.gemini_service import call_gemini_with_retry
 
-load_dotenv()
-
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
-
-if not GEMINI_API_KEY:
-    raise ValueError(
-        "GEMINI_API_KEY is missing. "
-        "Please add it to your .env file."
-    )
-
-
-client = genai.Client(
-    api_key=GEMINI_API_KEY
-)
-
-
-MODEL_NAME = "gemini-3.6-flash"
 
 class QuizQuestion(BaseModel):
     question: str = Field(
@@ -86,9 +64,8 @@ Transcript:
 -------------------------
 """
 
-    interaction = client.interactions.create(
-        model=MODEL_NAME,
-        input=prompt,
+    response_text = call_gemini_with_retry(
+        prompt=prompt,
         response_format={
             "type": "text",
             "mime_type": "application/json",
@@ -96,8 +73,5 @@ Transcript:
         }
     )
 
-    quiz = Quiz.model_validate_json(
-        interaction.output_text
-    )
-
+    quiz = Quiz.model_validate_json(response_text)
     return quiz

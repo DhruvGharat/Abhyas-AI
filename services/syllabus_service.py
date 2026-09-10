@@ -1,17 +1,5 @@
-import os
-from dotenv import load_dotenv
-from google import genai
 from models.exam_models import Syllabus
-
-load_dotenv()
-
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY is missing. Please add it to your .env file.")
-
-client = genai.Client(api_key=GEMINI_API_KEY)
-MODEL_NAME = "gemini-3.6-flash"
+from services.gemini_service import call_gemini_with_retry
 
 
 def parse_syllabus(syllabus_text: str) -> Syllabus:
@@ -38,9 +26,8 @@ Raw Syllabus Content:
 ---------------------
 """
 
-    interaction = client.interactions.create(
-        model=MODEL_NAME,
-        input=prompt,
+    response_text = call_gemini_with_retry(
+        prompt=prompt,
         response_format={
             "type": "text",
             "mime_type": "application/json",
@@ -48,5 +35,5 @@ Raw Syllabus Content:
         }
     )
 
-    syllabus = Syllabus.model_validate_json(interaction.output_text)
+    syllabus = Syllabus.model_validate_json(response_text)
     return syllabus
