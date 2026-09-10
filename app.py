@@ -4,11 +4,14 @@ from dotenv import load_dotenv
 
 from services.gemini_service import ask_gemini
 from services.tutor_service import answer_tutor_question
+from routes.exam_routes import exam_bp
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "abhyas_ai_secret_key_2026")
+
+app.register_blueprint(exam_bp)
 
 # Global in-memory cache to store transcripts by video_id
 TRANSCRIPT_STORE = {}
